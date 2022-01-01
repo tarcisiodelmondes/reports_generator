@@ -12,13 +12,19 @@ defmodule ReportsGenerator do
     "pastel"
   ]
 
+  @options ["foods", "users"]
+
   def build(filename) do
     filename
     |> Parser.parse_file()
     |> Enum.reduce(report_acc(), fn line, report -> sum_values(line, report) end)
   end
 
-  def fecth_higher_cost(users), do: Enum.max_by(users, fn {_key, value} -> value end)
+  def fecth_higher_cost(report, options) when options in @options do
+    {:ok, Enum.max_by(report[options], fn {_key, value} -> value end)}
+  end
+
+  def fecth_higher_cost(_report, _options), do: {:error, "Invalid option!"}
 
   defp sum_values([id, food_name, price], %{"users" => users, "foods" => foods} = report) do
     users = Map.put(users, id, users[id] + price)
